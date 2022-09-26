@@ -1,13 +1,10 @@
 import clsx from "clsx";
-import { Password } from "@prisma/client";
+import type { Password } from "@prisma/client";
 import { PlusCircleIcon } from "@heroicons/react/outline";
 import { useNavigate } from "@remix-run/react";
-export type IPassword = {
-  password: Password;
-  redirectTo: string;
-};
+
 export type ITableProps = {
-  passwords: IPassword[];
+  passwords: Password[];
   className?: string;
 };
 
@@ -43,17 +40,17 @@ export const PasswordTable = ({ passwords: items, className }: ITableProps) => {
         {items.map((item) => (
           <tr
             className="odd:bg-white even:bg-slate-200"
-            key={item.password.id}
-            onClick={() => navigate(item.redirectTo)}
+            key={item.id}
+            onClick={() => navigate(item.id)}
           >
             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-              {item.password.website}
+              {item.website}
             </td>
             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
               **************
             </td>
             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-              {item.password.authorId}
+              {item.authorId}
             </td>
           </tr>
         ))}
