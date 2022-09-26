@@ -42,6 +42,6 @@
     "node": ">=14"
   },
   "lint-staged": {
-    "*.js": "eslint --fix"
+    "*.{tsx,ts,js,jsx}": "eslint --fix"
   }
 }
