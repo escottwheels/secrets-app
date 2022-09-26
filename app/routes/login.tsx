@@ -1,9 +1,10 @@
 import { ContentLayout } from "~/components/layout/ContentLayout";
 import invariant from "tiny-invariant";
-import { Form, useTransition } from "@remix-run/react";
+import { Form, useActionData, useTransition } from "@remix-run/react";
 import { LockClosedIcon, LockOpenIcon } from "@heroicons/react/outline";
 import React from "react";
-import { ActionFunction, json } from "@remix-run/node";
+import type { ActionFunction} from "@remix-run/node";
+import { json } from "@remix-run/node";
 import {
   validateEmail,
   validateName,
@@ -12,10 +13,8 @@ import {
 import { login, register } from "~/utils/auth.server";
 
 export const action: ActionFunction = async ({ request }) => {
-  console.log("In beginning of action");
   const body = await request.formData();
   const actionType = body.get("_action");
-  console.log(actionType);
   const email = body.get("email");
   invariant(typeof email === "string", "Invalid Email");
   const password = body.get("password");
@@ -63,6 +62,7 @@ export const action: ActionFunction = async ({ request }) => {
 
 export default function Login() {
   const transition = useTransition();
+  const actionData = useActionData();
   const isBusy = transition.submission;
   const [formData, setFormData] = React.useState({
     email: "",
@@ -82,17 +82,7 @@ export default function Login() {
         >
           {action === "login" ? "Sign Up" : "Log In"}
         </button>
-        <span className="flex items-center">
-          <h2 className="text-slate-200 font-extrabold text-9xl mb-10">
-            secrets
-          </h2>
-          {isBusy ? (
-            <LockOpenIcon className="text-slate-200 ml-2 w-16 h-16 " />
-          ) : (
-            <LockClosedIcon className="text-slate-200 ml-2 w-16 h-16 " />
-          )}
-        </span>
-
+        <div>{actionData}</div>
         <Form method="post" className="rounded-2xl bg-white p-6 w-96">
           <label htmlFor="email" className="text-midnight font-semibold">
             Email
