@@ -1,5 +1,6 @@
 node_modules
 app/styles/app.css
+app.css
 
 /.cache
 /build
