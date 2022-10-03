@@ -24,7 +24,7 @@ model User {
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   password  String
-  firstName String
-  lastName  String
+  firstName String?
+  lastName  String?
   passwords Password[]
 }
