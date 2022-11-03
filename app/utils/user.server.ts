@@ -1,16 +1,29 @@
 import bcrypt from "bcryptjs";
 import type { RegisterForm } from "./types.server";
 import { prisma } from "./prisma.server";
+type createUserProps = {
+  email: string;
+  password: string;
+};
 
-export const createUser = async (user: RegisterForm) => {
-  const passwordHash = await bcrypt.hash(user.password, 10);
-  const newUser = await prisma.user.create({
-    data: {
-      password: passwordHash,
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
+export const createOrFindUser = async ({
+  email,
+  password,
+}: createUserProps) => {
+  console.log("in createOrFindUser");
+  const passwordHash = await bcrypt.hash(password, 10);
+  let user = await prisma.user.findUnique({
+    where: {
+      email: email,
     },
   });
-  return { id: newUser.id, email: user.email };
+  if (!user) {
+    user = await prisma.user.create({
+      data: {
+        password: passwordHash,
+        email: email,
+      },
+    });
+  }
+  return user;
 };

@@ -1,17 +1,26 @@
 import type { Password, User } from "@prisma/client";
 import { prisma } from "~/utils/prisma.server";
 
-export async function createPassword(
-  user: User,
+export async function addPasswordToUser(
+  userId: User["id"],
   password: string,
   website: string
-): Promise<Password> {
+): Promise<Password[]> {
   console.log("in createPassword business");
-  return await prisma.password.create({
+  console.log("userid", userId);
+  const passwords = await prisma.user.update({
+    where: { id: userId },
     data: {
-      password: password,
-      website: website,
-      authorId: user.id,
+      passwords: {
+        create: {
+          password: password,
+          website: website,
+        },
+      },
+    },
+    select: {
+      passwords: true,
     },
   });
+  return passwords.passwords;
 }

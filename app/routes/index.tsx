@@ -1,9 +1,9 @@
 import { ContentLayout } from "~/components/layout/ContentLayout";
 import invariant from "tiny-invariant";
 import { Form, useActionData, useTransition } from "@remix-run/react";
-import { LockClosedIcon, LockOpenIcon } from "@heroicons/react/outline";
 import React from "react";
-import type { ActionFunction} from "@remix-run/node";
+import type { ActionFunction, LoaderArgs} from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import {
   validateEmail,
@@ -11,54 +11,59 @@ import {
   validatePassword,
 } from "~/utils/validators.server";
 import { login, register } from "~/utils/auth.server";
+import { authenticator } from "~/utils/authenticate";
+
+export async function loader(args: LoaderArgs) {
+  console.log("In login loader");
+  return await authenticator.isAuthenticated(args.request, {
+    successRedirect: "/home/passwords",
+  });
+}
 
 export const action: ActionFunction = async ({ request }) => {
-  const body = await request.formData();
-  const actionType = body.get("_action");
-  const email = body.get("email");
-  invariant(typeof email === "string", "Invalid Email");
-  const password = body.get("password");
-  invariant(typeof password === "string", "Invalid password");
-  var firstName = body.get("firstName");
-  var lastName = body.get("lastName");
-  if (actionType === "register") {
-    invariant(typeof firstName === "string", "Invalid first name");
-    invariant(typeof lastName === "string", "Invalid last name");
-  }
+  console.log("In login action");
+  console.log("action == login");
+  return await authenticator.authenticate("user-pass", request, {
+    successRedirect: "/home/passwords",
+  });
+  // } else if (actionType === "register") {
+  //   const email = body.get("email");
+  //   invariant(typeof email === "string", "Invalid Email");
+  //   const password = body.get("password");
+  //   invariant(typeof password === "string", "Invalid password");
+  //   var firstName = body.get("firstName");
+  //   var lastName = body.get("lastName");
+  //   if (actionType === "register") {
+  //     invariant(typeof firstName === "string", "Invalid first name");
+  //     invariant(typeof lastName === "string", "Invalid last name");
+  //   }
 
-  const errors = {
-    email: validateEmail(email),
-    password: validatePassword(password),
-    ...(actionType === "register"
-      ? {
-          firstName: validateName((firstName as string) || ""),
-          lastName: validateName((lastName as string) || ""),
-        }
-      : {}),
-  };
+  //   const errors = {
+  //     email: validateEmail(email),
+  //     password: validatePassword(password),
+  //     ...(actionType === "register"
+  //       ? {
+  //           firstName: validateName((firstName as string) || ""),
+  //           lastName: validateName((lastName as string) || ""),
+  //         }
+  //       : {}),
+  //   };
 
-  if (Object.values(errors).some(Boolean)) {
-    return json(
-      {
-        errors,
-        fields: { email, password, firstName, lastName },
-        form: actionType,
-      },
-      { status: 400 }
-    );
-  }
-
-  switch (actionType) {
-    case "login":
-      return await login({ email, password });
-
-    case "register":
-      firstName = firstName as string;
-      lastName = lastName as string;
-
-      return await register({ email, password, firstName, lastName });
-  }
+  //   if (Object.values(errors).some(Boolean)) {
+  //     return json(
+  //       {
+  //         errors,
+  //         fields: { email, password, firstName, lastName },
+  //         form: actionType,
+  //       },
+  //       { status: 400 }
+  //     );
+  //   }
+  //   firstName = firstName as string;
+  //   lastName = lastName as string;
 };
+//   return await register({ email, password, firstName, lastName });
+// }
 
 export default function Login() {
   const transition = useTransition();

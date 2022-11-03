@@ -1,15 +1,63 @@
 import clsx from "clsx";
 import type { Password } from "@prisma/client";
-import { PlusCircleIcon } from "@heroicons/react/outline";
+import { PencilIcon, PlusCircleIcon } from "@heroicons/react/outline";
 import { useNavigate } from "@remix-run/react";
+import { DeleteIcon } from "evergreen-ui";
+import { useState } from "react";
 
 export type ITableProps = {
   passwords: Password[];
   className?: string;
 };
+type PasswordProps = {
+  children: Password;
+};
+
+export const PasswordText = ({ children: password }: PasswordProps) => {
+  const [copiedText, setCopiedText] = useState("");
+  function copyText() {}
+
+  return (
+    <span onClick={() => setCopiedText(password.password)}>
+      {password.password}
+    </span>
+  );
+};
+
+export const PasswordRow = ({ children: password }: PasswordProps) => {
+  const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  return (
+    <tr
+      className="group odd:bg-white even:bg-slate-200"
+      key={password.id}
+      onClick={() => navigate(password.id)}
+    >
+      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+        {password.website}
+      </td>
+      <td className="flex align-center px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+        {showPassword ? (
+          <PasswordText>{password}</PasswordText>
+        ) : (
+          "**************"
+        )}
+        <PencilIcon
+          className="w-4 h-4 ml-2 invisible group-hover:visible text-black cursor-pointer text-gray-500 hover:text-gray-900"
+          onClick={() => {
+            setShowPassword(!showPassword);
+          }}
+        />
+      </td>
+
+      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+        <DeleteIcon className="text-red w-4 h-4å" />
+      </td>
+    </tr>
+  );
+};
 
 export const PasswordTable = ({ passwords: items, className }: ITableProps) => {
-  const navigate = useNavigate();
   return (
     <table
       className={clsx(className, "table-auto w-3/4 bg-slate-200 rounded-md")}
@@ -38,21 +86,7 @@ export const PasswordTable = ({ passwords: items, className }: ITableProps) => {
       </thead>
       <tbody>
         {items.map((item) => (
-          <tr
-            className="odd:bg-white even:bg-slate-200"
-            key={item.id}
-            onClick={() => navigate(item.id)}
-          >
-            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-              {item.website}
-            </td>
-            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-              **************
-            </td>
-            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-              {item.authorId}
-            </td>
-          </tr>
+          <PasswordRow key={item.id}>{item}</PasswordRow>
         ))}
       </tbody>
     </table>
