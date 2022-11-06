@@ -29,21 +29,21 @@ export const PasswordRow = ({ children: password }: PasswordProps) => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   return (
     <tr
-      className="group odd:bg-white even:bg-slate-200"
+      className="odd:bg-white even:bg-slate-200"
       key={password.id}
       onClick={() => navigate(password.id)}
     >
       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
         {password.website}
       </td>
-      <td className="flex align-center px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+      <td className="group flex align-center px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
         {showPassword ? (
           <PasswordText>{password}</PasswordText>
         ) : (
           "**************"
         )}
         <PencilIcon
-          className="w-4 h-4 ml-2 invisible group-hover:visible text-black cursor-pointer text-gray-500 hover:text-gray-900"
+          className="w-4 h-4 ml-2 group-hover:visible text- cursor-pointer text-gray-500 hover:text-gray-900"
           onClick={() => {
             setShowPassword(!showPassword);
           }}
@@ -56,6 +56,12 @@ export const PasswordRow = ({ children: password }: PasswordProps) => {
     </tr>
   );
 };
+
+const ActionTabs = () => {
+
+
+
+}
 
 export const PasswordTable = ({ passwords: items, className }: ITableProps) => {
   return (
