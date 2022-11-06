@@ -1,8 +1,9 @@
 node_modules
 app/styles/app.css
-app.css
+.yarnrc.yml
 
 /.cache
 /build
 /public/build
 .env
+app/styles/app.css
