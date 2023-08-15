@@ -6,8 +6,6 @@ export async function addPasswordToUser(
   password: string,
   website: string
 ): Promise<Password[]> {
-  console.log("in createPassword business");
-  console.log("userid", userId);
   const passwords = await prisma.user.update({
     where: { id: userId },
     data: {

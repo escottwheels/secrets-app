@@ -1,6 +1,6 @@
 import type { RegisterForm, LoginForm } from "./types.server";
 import { prisma } from "./prisma.server";
-import { json, createCookieSessionStorage, redirect } from "@remix-run/node";
+import { createCookieSessionStorage } from "@remix-run/node";
 import { createOrFindUser } from "./user.server";
 import bcrypt from "bcryptjs";
 
@@ -25,83 +25,65 @@ export const sessionStorage = createCookieSessionStorage({
 export async function register(user: RegisterForm) {
   const exists = await prisma.user.count({ where: { email: user.email } });
   if (exists) {
-    return json(
-      { error: `User already exists with that email` },
-      { status: 400 }
-    );
+    return null;
   }
 
   const newUser = await createOrFindUser(user);
   if (!newUser) {
-    return json(
-      {
-        error: `Something went wrong trying to create a new user.`,
-        fields: { email: user.email, password: user.password },
-      },
-      { status: 400 }
-    );
+    return null;
   }
-  return createUserSession(newUser.id, "/");
+  return newUser;
 }
 
 export async function login({ email, password }: LoginForm) {
   const user = await prisma.user.findUnique({ where: { email } });
 
   if (!user || !(await bcrypt.compare(password, user.password))) {
-    return json({ error: `Incorrect login` }, { status: 400 });
+    return null;
   }
-  return createUserSession(user.id, "/passwords");
+  return user
 }
 
-function getUserSession(request: Request) {
-  return sessionStorage.getSession(request.headers.get("Cookie"));
-}
+// function getUserSession(request: Request) {
+//   return sessionStorage.getSession(request.headers.get("Cookie"));
+// }
 
-export async function createUserSession(userId: number, redirectTo: string) {
-  const session = await sessionStorage.getSession();
+// export async function createUserSession(userId: number, redirectTo: string) {
+//   const session = await sessionStorage.getSession();
 
-  session.set("userId", userId);
-  console.log("user session, userid: ", session.get("userId"));
-  return redirect(redirectTo, {
-    headers: {
-      "Set-Cookie": await sessionStorage.commitSession(session),
-    },
-  });
-}
+//   session.set("userId", userId);
+//   console.log("user session, userid: ", session.get("userId"));
+//   return redirect(redirectTo, {
+//     headers: {
+//       "Set-Cookie": await sessionStorage.commitSession(session),
+//     },
+//   });
+// }
 
-export async function logout(request: Request) {
-  console.log("in logout func");
-  const session = await getUserSession(request);
-  return redirect("/", {
-    headers: {
-      "Set-Cookie": await sessionStorage.destroySession(session),
-    },
-  });
-}
 
-export async function getUserId(request: Request) {
-  const session = await getUserSession(request);
-  const userId = session.get("userId");
-  if (!userId || typeof userId !== "number") return null;
-  return userId;
-}
+// export async function getUserId(request: Request) {
+//   const session = await getUserSession(request);
+//   const userId = session.get("userId");
+//   if (!userId || typeof userId !== "number") return null;
+//   return userId;
+// }
 
 /**
  * Returns the user object from the userId retreived from the request object
  * @param request The request object sent with the session
  * @returns
  */
-export async function getUser(request: Request) {
-  const userId = await getUserId(request);
-  if (typeof userId !== "number") {
-    return null;
-  }
-  try {
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-    });
-    return user;
-  } catch {
-    throw logout(request);
-  }
-}
+// export async function getUser(request: Request) {
+//   const userId = await getUserId(request);
+//   if (typeof userId !== "number") {
+//     return null;
+//   }
+//   try {
+//     const user = await prisma.user.findUnique({
+//       where: { id: userId.toString() },
+//     });
+//     return user;
+//   } catch {
+//     throw logout(request);
+//   }
+// }
