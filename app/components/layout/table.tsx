@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import type { Password } from "@prisma/client";
-import { EyeIcon } from "@heroicons/react/outline";
+import { EyeIcon, EyeOffIcon } from "@heroicons/react/outline";
 import { Form } from "@remix-run/react";
 import { useState } from "react";
 
@@ -37,12 +37,20 @@ export const PasswordRow = ({ children: password }: PasswordProps) => {
         ) : (
           <span className="mr-2">**************</span>
         )}
-        <EyeIcon
-          className="w-4 h-4 ml-2 mr-auto group-hover:visible cursor-pointer text-gray-500 hover:text-gray-900"
-          onClick={() => {
-            setShowPassword(!showPassword);
-          }}
-        />
+        {!showPassword ?
+          <EyeIcon
+            className="w-4 h-4 ml-auto group-hover:visible cursor-pointer text-gray-500 hover:text-gray-900"
+            onClick={() => {
+              setShowPassword(!showPassword);
+            }}
+          />
+          : <EyeOffIcon
+            className="w-4 h-4 ml-auto group-hover:visible cursor-pointer text-gray-500 hover:text-gray-900"
+            onClick={() => {
+              setShowPassword(!showPassword);
+            }}
+          />
+        }
       </td>
     </tr>
   );

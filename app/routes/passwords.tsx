@@ -47,10 +47,10 @@ const AddPasswordInputs = ({ userId }: { userId: string }) => {
       className="md:max-w-xl max-w-xs inline-flex table-row odd:bg-white even:bg-slate-200"
     >
       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-        <input form="add-password" className=" h-6" id="webiste" name="website" autoFocus />
+        <input form="add-password" className="px-2 text-white focus:outline-none rounded-xl bg-cobalt h-8" id="webiste" name="website" autoFocus />
       </td>
       <td className="group flex align-center px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-        <input form="add-password" className="h-6" type="sub" name="password" id="password" />
+        <input form="add-password" className="text-white px-2 focus:outline-none rounded-xl bg-cobalt h-8" type="sub" name="password" id="password" />
         <input form="add-password" type="hidden" name="userId" value={userId} />
         {/* <CheckIcon type="submit" className='text-black' />
          */}
