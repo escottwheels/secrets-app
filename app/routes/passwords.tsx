@@ -54,7 +54,7 @@ const AddPasswordInputs = ({ userId }: { userId: string }) => {
         <input form="add-password" type="hidden" name="userId" value={userId} />
         {/* <CheckIcon type="submit" className='text-black' />
          */}
-        {/* <button type="submit">Submit</button> */}
+        <button type="submit"></button>
       </td>
     </tr>
   )
@@ -96,7 +96,7 @@ export default function PasswordScreen() {
               setOpenProfileScreen(false)
             }}
           >
-            {showDetermineStrength && !openProfileScreen ? "Back" : "find passwords strength"}
+            {showDetermineStrength && !openProfileScreen ? "Back" : "find password similarity"}
           </button>
           {!showDetermineStrength && <button
             className="flex-end rounded-xl w-30 h-15 mt-2 bg-cobalt-midnight px-3 py-2 text-white font-semibold transition duration-300 ease-in-out hover:bg-yellow-400 hover:-translate-y-1"

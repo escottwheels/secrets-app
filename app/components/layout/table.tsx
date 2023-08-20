@@ -11,24 +11,25 @@ export type ITableProps = {
 };
 type PasswordProps = {
   children: Password;
+  className?: string;
 };
 
-export const PasswordText = ({ children: password }: PasswordProps) => {
+export const PasswordText = ({ children: password, className }: PasswordProps) => {
   return (
-    <span>
+    <span className={clsx(className)}>
       {password.password}
     </span>
   );
 };
 
-export const PasswordRow = ({ children: password }: PasswordProps) => {
+export const PasswordRow = ({ children: password, className }: PasswordProps) => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   return (
     <tr
-      className="odd:bg-white even:bg-slate-200"
+      className={clsx(className, "last:bg-stone odd:bg-white even:bg-slate-200")}
       key={password.id}
     >
-      <td className="uppercase px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
         {password.website}
       </td>
       <td className="group flex align-center px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">

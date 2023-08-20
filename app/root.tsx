@@ -30,7 +30,7 @@ export default function App() {
         <Links />
       </head>
       <body className="bg-cobalt">
-        <div className="bg-cobalt flex flex-col items-center">
+        <div className="bg-cobalt h-full flex flex-col items-center">
           <ContentLayout className="w-screen mx-96">
             <span className="flex justify-center items-center">
               <h2 className="text-white items-center font-extrabold text-9xl mt-10 mb-10">
