@@ -1,10 +1,10 @@
 import { ContentLayout } from "~/components/layout/ContentLayout";
 import { Form, useActionData, useLoaderData, useTransition } from "@remix-run/react";
-import React from "react";
+import React, { useRef } from "react";
 import { json, type ActionFunction, type LoaderArgs } from "@remix-run/node";
 import { authenticator } from "~/utils/authenticate";
 import { sessionStorage } from "~/utils/auth.server";
-import { EyeIcon } from "@heroicons/react/outline";
+import { EyeIcon, EyeOffIcon } from "@heroicons/react/outline";
 
 export async function loader(args: LoaderArgs) {
   const session = await sessionStorage.getSession(
@@ -16,7 +16,6 @@ export async function loader(args: LoaderArgs) {
 }
 
 export const action: ActionFunction = async ({ request, context }) => {
-  console.log("In login action");
   const resp = await authenticator.authenticate("user", request, {
     successRedirect: "/passwords",
     failureRedirect: "/login",
@@ -32,19 +31,17 @@ export default function Login() {
   const transition = useTransition();
   const actionData = useActionData();
   const isBusy = transition.submission;
-  // const [formData, setFormData] = React.useState({
-  //   email: "",
-  //   password: "",
-  //   firstName: "",
-  //   lastName: "",
-  // });
+
   const [showMasterPassword, setShowMasterPassword] = React.useState(false);
 
   const [action, setAction] = React.useState("login");
 
+
+  const passwordRef = useRef<HTMLInputElement>(null)
+
   return (
     <ContentLayout>
-      <div className="h-64 w-64 m-0 p-0 flex justify-center flex-col items-center">
+      <div className="h-full w-full m-0 p-0 flex justify-center flex-col items-center">
         <button
           onClick={() => setAction(action === "login" ? "register" : "login")}
           className="absolute top-8 right-8 rounded-xl bg-cobalt-midnight font-semibold text-white px-3 py-2 transition duration-300 ease-in-out hover:bg-yellow-400 hover:-translate-y-1"
@@ -52,7 +49,8 @@ export default function Login() {
           {action === "login" ? "Sign Up" : "Log In"}
         </button>
         <div>{actionData}</div>
-        <Form method="post" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-6 w-96">
+        <Form method="post" className="rounded-2xl bg-white p-6 w-3/4">
+
           <label htmlFor="email" className="text-midnight font-semibold">
             Email
           </label>
@@ -61,24 +59,40 @@ export default function Login() {
             type="text"
             id="email"
             name="email"
-            className="w-full p-2 border border-midnight rounded-xl my-2"
+            className="w-full p-2 border focus:outline-cobalt-midnight rounded-xl my-2"
           />
-
-          <label htmlFor="password" className="text-midnight font-semibold">
-            Master Password
-          </label>
+          <span className="flex items-center">
+            <label htmlFor="password" className="text-midnight font-semibold">
+              Master Password
+            </label>
+            {!showMasterPassword ? <EyeIcon
+              className="h-4 w-4 ml-1 cursor-pointer text-gray-500 hover:text-gray-900"
+              onClick={() => {
+                setShowMasterPassword(!showMasterPassword);
+                passwordRef.current?.focus()
+                if (passwordRef.current) {
+                  setTimeout(() => {
+                    if (passwordRef.current) {
+                      passwordRef.current.selectionStart = passwordRef.current.selectionEnd = 10000;
+                    }
+                  }, 0);
+                }
+              }}
+            /> : <EyeOffIcon
+              onClick={() => {
+                setShowMasterPassword(!showMasterPassword);
+              }}
+              className="h-4 ml-1 w-4 cursor-pointer text-gray-500 hover:text-gray-900"
+            />}
+          </span>
           <input
-            type="password"
+            ref={passwordRef}
+            type={showMasterPassword ? "text" : "password"}
             id="password"
             name="password"
-            className="w-full p-2 border border-colbaltmidnight rounded-xl my-2"
+            className="w-full p-2 border focus:outline-cobalt-midnight rounded-xl my-2"
           />
-          <EyeIcon
-            className="h-6 w-full absolete bottom-24 cursor-pointer text-gray-500 hover:text-gray-900"
-            onClick={() => {
-              setShowMasterPassword(!showMasterPassword);
-            }}
-          />
+
 
           {action === "register" && (
             <>

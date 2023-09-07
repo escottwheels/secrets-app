@@ -3,6 +3,6 @@
 @tailwind utilities;
 
 
-html, body, #app, #app>div {
+/* html, body, #app, #app>div {
     height: 100%
-  }
+  } */

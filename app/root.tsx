@@ -25,13 +25,13 @@ export default function App() {
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        {/* <meta name="viewport" content="width=device-width,initial-scale=1" /> */}
         <Meta />
         <Links />
       </head>
-      <body className="bg-cobalt">
-        <div className="bg-cobalt h-full flex flex-col items-center">
-          <ContentLayout className="w-screen mx-96">
+      <body className="bg-cobalt ">
+        <div className="bg-cobalt flex flex-col items-center">
+          <ContentLayout className="py-6 mx-96">
             <span className="flex justify-center items-center">
               <h2 className="text-white items-center font-extrabold text-9xl mt-10 mb-10">
                 secrets

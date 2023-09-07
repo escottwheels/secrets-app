@@ -6,6 +6,7 @@ export async function addPasswordToUser(
   password: string,
   website: string
 ): Promise<Password[]> {
+
   const passwords = await prisma.user.update({
     where: { id: userId },
     data: {
@@ -21,4 +22,38 @@ export async function addPasswordToUser(
     },
   });
   return passwords.passwords;
+}
+
+export async function deletePasswordsFromUser(
+  userId: User["id"],
+  passwordIds: Password["id"][]
+): Promise<number> {
+
+  const updatedPasswords = await prisma.password.deleteMany({
+    where: {
+      authorId: userId,
+      id: {
+        in: passwordIds
+      }
+    }
+  });
+  return updatedPasswords.count
+}
+
+
+
+export async function editPassword(
+  passwordId: Password["id"],
+  newPassword: Password["password"]
+): Promise<Password> {
+
+  const updatedPassword = await prisma.password.update({
+    where: {
+      id: passwordId
+    },
+    data: {
+      password: newPassword
+    }
+  });
+  return updatedPassword
 }

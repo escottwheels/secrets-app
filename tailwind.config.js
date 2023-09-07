@@ -1,5 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  variants: {
+    backgroundColor: ['responsive', 'hover', 'focus', 'active'],
+  },
   content: ["./app/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
