@@ -1,11 +1,12 @@
-import type { Dispatch, SetStateAction} from "react";
-import { useEffect , useState } from "react";
+import type { Dispatch, SetStateAction } from "react";
+import { useState } from "react";
 import clsx from "clsx";
 import type { Password } from "@prisma/client";
 import { EyeIcon, EyeOffIcon, DotsVerticalIcon } from "@heroicons/react/outline";
-import { Form } from "@remix-run/react";
-import { Checkbox } from "@mui/material";
+import { Form, useNavigation } from "@remix-run/react";
+import { Checkbox, MenuItem, Popover } from "@mui/material";
 import { Circle, CircleOutlined, DeleteOutline } from "@mui/icons-material";
+import { ClipLoader } from "react-spinners";
 
 export type ITableProps = {
   passwords: Password[];
@@ -36,6 +37,21 @@ export const PasswordText = ({ password, className }: PasswordTextProps) => {
 export const PasswordRow = ({ password, className, IsEditable, setSelectedPasswords }: PasswordRowProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const [canEditPassword, setCanEditPassword] = useState(false)
+
+
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? 'simple-popover' : undefined;
+
   return (
     <tr
       className={clsx(className, "transition duration-300 ease-in-out")}
@@ -72,8 +88,23 @@ export const PasswordRow = ({ password, className, IsEditable, setSelectedPasswo
               }
             }} />
         </td>}
-      <td className="hover:text-cobalt hover:cursor-pointer hover:font-bold px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-        {password.website}
+      <td
+
+        className="hover:text-cobalt hover:cursor-pointer hover:font-bold px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+        <Popover
+          id={id}
+          open={open}
+          anchorEl={anchorEl}
+          onClose={handleClose}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left',
+          }}
+        >
+          <MenuItem className="text-xs">Edit</MenuItem>
+          <MenuItem className="text-xs">Delete</MenuItem>
+        </Popover>
+        <span onClick={handleClick}>{password.website}</span>
       </td>
       <td className="flex align-center px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
         {canEditPassword && <input type="hidden" name="_action" value="editPassword" />}
@@ -101,10 +132,8 @@ export const PasswordRow = ({ password, className, IsEditable, setSelectedPasswo
         }
       </td>
       <td className="text-gray-500 hover:text-gray-900  ">
-        <DotsVerticalIcon type="" className="w-4 h-4 mr-3 cursor-pointer hover:text-gray-900 text-gray-500"
-        // onClick={() => openPasswordMenu(password.id)}
+        <DotsVerticalIcon className="w-4 h-4 mr-3 text-white"
         />
-        {/* <Button>Hello</Button> */}
       </td>
     </tr>
   );
@@ -112,11 +141,18 @@ export const PasswordRow = ({ password, className, IsEditable, setSelectedPasswo
 
 export const PasswordTable = ({ passwords: items, className, isEditable, InputPasswordRow }: ITableProps) => {
   const [selectedPasswords, setSelectedPasswords] = useState<Record<string, string>>();
+  const navigation = useNavigation();
+  const isDeletingPasswords = navigation.state === "submitting" && navigation.formData?.get("_action") === "deletePassword"
 
-  // Resets the selectedPasswords when editable state is changed
-  useEffect(() => {
-    setSelectedPasswords(undefined)
-  }, [isEditable])
+
+  function checkPasswordsAreDeleting() {
+    if (isDeletingPasswords === true) {
+      window.setTimeout(checkPasswordsAreDeleting, 10); /* this checks the flag every 100 milliseconds*/
+    }
+    else {
+      setSelectedPasswords(undefined)
+    }
+  }
 
   return (
     <Form reloadDocument id="edit-password" method="post">
@@ -124,7 +160,7 @@ export const PasswordTable = ({ passwords: items, className, isEditable, InputPa
         className={clsx(className, "mb-20 bg-white rounded-lg")}
       >
         <thead>
-          <tr className={clsx(items && items.length > 0 && "border-b-2", "mx-2")}>
+          <tr className="border-b-2 mx-2">
             {isEditable &&
               <th scope="col"
                 className="text-sm font-medium text-gray-900">
@@ -141,21 +177,43 @@ export const PasswordTable = ({ passwords: items, className, isEditable, InputPa
             >
               PASSWORD
             </th>
-            <th>
+            <th
+              scope="col"
+              className="text-sm font-medium text-gray-900 text-left">
               {selectedPasswords && Object.keys(selectedPasswords).length >= 1 &&
                 <button
                   type="submit"
-                  className="w-4 h-4 mr-3 cursor-pointer transition duration-300 ease-in-out hover:text-yellow-400 hover:-translate-y-1 ml-auto inline-block text-cobalt-midnight"
+                  className="w-4 h-4 flex justify-center items-center cursor-pointer transition duration-300 ease-in-out hover:text-yellow-400 hover:-translate-y-1 text-cobalt-midnight"
                 >
                   <input type="hidden" name="_action" value="deletePassword" />
                   <input type="hidden" name="passwords" value={Object.keys(selectedPasswords)} />
-                  {<DeleteOutline />}
+                  {!isDeletingPasswords &&
+                    <DeleteOutline
+                      onClick={async () => {
+                        await new Promise(resolve => setTimeout(resolve, 100))
+                        checkPasswordsAreDeleting();
+                      }} />
+                  }
+                  {<ClipLoader size={25} loading={isDeletingPasswords} />}
                 </button>
               }
             </th>
           </tr>
         </thead>
         <tbody className="rounded-xl">
+          {items.length == 0 && InputPasswordRow == null
+            &&
+            // <span className="font-bold bg-white w-full flex text-center justify-center items-center text-cobalt">No password. Click the plus sign to add some secrets!</span>
+            <tr>
+              <td colSpan={4} className=" py-8 px-2 w-full font-bold grow text-center">
+                <div className="font-extrabold text-xl text-cobalt">No passwords currently entered </div>
+                <div className="text-stone-light">
+                  Click the plus sign to add some secrets!
+                </div>
+              </td>
+            </tr>
+
+          }
           {InputPasswordRow}
           {items.map((item) => (
             <PasswordRow setSelectedPasswords={setSelectedPasswords} password={item} IsEditable={isEditable} key={item.id} />

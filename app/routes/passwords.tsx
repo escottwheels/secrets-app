@@ -140,7 +140,7 @@ export default function PasswordScreen() {
             {!showAddPasswordFields ? <PlusIcon className="h-6 w-6 text-white" /> : <UndoOutlined className="h-6 w-6 text-white" />}
           </button>
           <button
-            disabled={showAddPasswordFields}
+            disabled={showAddPasswordFields || passwords.length == 0}
             className="flex-end rounded-xl w-30 h-15 mt-2 bg-cobalt-midnight disabled:bg-stone-light disabled:transform-none px-3 py-2 text-white font-semibold transition duration-300 ease-in-out hover:bg-yellow-400 hover:-translate-y-1"
             onClick={() => setIsEditable(!isEditable)}
           >

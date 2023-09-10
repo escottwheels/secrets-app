@@ -106,7 +106,7 @@ export default function Login() {
                 type="text"
                 id="firstName"
                 name="firstName"
-                className="w-full p-2 border rounded-xl my-2"
+                className="w-full p-2 border focus:outline-cobalt-midnight rounded-xl my-2"
               />
               <label htmlFor="lastName" className="text-midnight font-semibold">
                 Last Name
@@ -115,7 +115,7 @@ export default function Login() {
                 type="text"
                 id="lastName"
                 name="lastName"
-                className="w-full p-2 border rounded-xl my-2"
+                className="w-full p-2 border focus:outline-cobalt-midnight rounded-xl my-2"
               />
             </>
           )}

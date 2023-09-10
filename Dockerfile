@@ -1,5 +1,5 @@
 # base node image
-FROM node:16-bullseye-slim as base
+FROM node:18.17.1-bullseye-slim as base
 
 # Install openssl for Prisma
 RUN apt-get update && apt-get install -y openssl
@@ -12,12 +12,10 @@ WORKDIR /app
 
 ADD package.json yarn.lock
 RUN yarn install --production=false
-RUN yarn add concurrently
 
 # Setup production node_modules
 FROM base as production-deps
 
-RUN mkdir /app
 WORKDIR /app
 
 COPY --from=deps /app/node_modules /app/node_modules
@@ -27,9 +25,6 @@ RUN npm prune --production
 # Build the app
 FROM base as build
 
-ENV NODE_ENV=production
-
-RUN mkdir /app
 WORKDIR /app
 
 COPY --from=deps /app/node_modules /app/node_modules
@@ -44,19 +39,20 @@ RUN yarn build
 
 # Finally, build the production image with minimal footprint
 FROM base
+ENV DATABASE_URL=ostgres://postgres:VyLJIHL3isEnies@localhost:5432/secretsdb
+ENV PORT="8080"
+ENV NODE_ENV="production"
 
-ENV NODE_ENV=production
-
-RUN mkdir /app
 WORKDIR /app
 
 COPY --from=production-deps /app/node_modules /app/node_modules
+COPY --from=build /app/node_modules/.prisma /app/node_modules/.prisma
 
-# Uncomment if using Prisma
-# COPY --from=build /app/node_modules/.prisma /app/node_modules/.prisma
+COPY --from=build /myapp/build /myapp/build
+COPY --from=build /myapp/public /myapp/public
+COPY --from=build /myapp/package.json /myapp/package.json
+COPY --from=build /myapp/start.sh /myapp/start.sh
+COPY --from=build /myapp/prisma /myapp/prism
 
-COPY --from=build /app/build /app/build
-COPY --from=build /app/public /app/public
-ADD . .
 
-CMD ["yarn", "dev"]
+ENTRYPOINT [ "./start.sh" ]

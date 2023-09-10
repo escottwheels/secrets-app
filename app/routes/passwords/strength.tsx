@@ -1,11 +1,11 @@
-import type { LoaderArgs} from "@remix-run/node";
+import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { ContentLayout } from "~/components/layout/ContentLayout";
 import { loader as parentLoader } from "../passwords"
 import { useLoaderData } from "@remix-run/react";
 import type { Password } from "@prisma/client";
 import type { DangerSubstring } from "../../business/findPasswordStrength";
-import { findPasswordSimilarity  } from "../../business/findPasswordStrength"
+import { findPasswordSimilarity } from "../../business/findPasswordStrength"
 
 export async function loader(args: LoaderArgs) {
     const { passwords } = await (await parentLoader(args)).json()
@@ -22,7 +22,7 @@ export default function PasswordsSimilarityStrength() {
                     <div className="w-full text-stone bg-white p-8 rounded-lg mt-2">
                         <h1 className="text-xl">
                             <span className="text-2xl">No similarities detected</span>
-                            <span className="ml-4 text-yellow-400">Good job!</span>
+                            <span className="ml-4 font-bold text-green-500">Good job!</span>
                         </h1>
                     </div>
                 }
