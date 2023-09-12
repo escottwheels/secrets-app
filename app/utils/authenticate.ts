@@ -1,7 +1,7 @@
 // our authenticate function receives the Request, the Session and a Headers
 import type { User } from "@prisma/client";
 
-import { Authenticator, AuthorizationError } from "remix-auth";
+import { Authenticator } from "remix-auth";
 import { FormStrategy } from "remix-auth-form";
 import { login, register, sessionStorage } from "./auth.server";
 
@@ -37,7 +37,6 @@ authenticator.use(
     try {
       switch (actionType) {
         case "login":
-          console.log("in login in authenticator")
           user = await login({ email, password })
           break;
         case "register":
@@ -45,7 +44,7 @@ authenticator.use(
           break;
       }
     } catch (error) {
-      throw new AuthorizationError("Couldn't authorize user")
+      throw error
     }
     return Promise.resolve(user);
   }),

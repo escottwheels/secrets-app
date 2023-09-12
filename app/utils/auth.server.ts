@@ -3,6 +3,7 @@ import { prisma } from "./prisma.server";
 import { createCookieSessionStorage } from "@remix-run/node";
 import { createOrFindUser } from "./user.server";
 import bcrypt from "bcryptjs";
+import { AuthorizationError } from "remix-auth";
 
 // COOKIE STORAGE STUFF
 const sessionSecret = process.env.SESSION_SECRET;
@@ -16,7 +17,7 @@ export const sessionStorage = createCookieSessionStorage({
     secrets: [sessionSecret],
     sameSite: "lax",
     path: "/",
-    maxAge: 60 * 60 * 24 * 30,
+    maxAge: 1 * 60 * 30,
     httpOnly: true,
   },
 });
@@ -39,7 +40,7 @@ export async function login({ email, password }: LoginForm) {
   const user = await prisma.user.findUnique({ where: { email } });
 
   if (!user || !(await bcrypt.compare(password, user.password))) {
-    return null;
+    throw new AuthorizationError("Username doesn't exist or password is incorrect. Try again");
   }
   return user
 }

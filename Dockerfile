@@ -40,7 +40,7 @@ RUN npm run build
 # Finally, build the production image with minimal footprint
 FROM base
 
-ENV DATABASE_URL=postgres://secrets_app:TNj6Nlu9vIYZHt0@secretsdb.flycast:5432/secrets_app?sslmode=disable
+ENV DATABASE_URL=$DATABASE_URL
 ENV PORT="5432"
 ENV NODE_ENV="production"
 

@@ -66,7 +66,6 @@ export async function action(args: ActionArgs) {
 }
 
 const AddPasswordInputs = ({ userId }: { userId: string }) => {
-
   return (
     <tr
       className="md:max-w-xl max-w-xs table-row even:bg-slate-200"
@@ -132,7 +131,7 @@ export default function PasswordScreen() {
                 window.history.back()
               }
               else {
-                window.history.pushState(null, "", "http://localhost:3000/passwords/add")
+                window.history.pushState(null, "", `${location.pathname}/add`)
               }
               setShowAddPasswordFields(!showAddPasswordFields)
             }}

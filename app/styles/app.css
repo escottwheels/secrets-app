@@ -662,18 +662,6 @@ video {
   margin-top: 1.25rem;
 }
 
-.ml-auto {
-  margin-left: auto;
-}
-
-.block {
-  display: block;
-}
-
-.inline-block {
-  display: inline-block;
-}
-
 .inline {
   display: inline;
 }

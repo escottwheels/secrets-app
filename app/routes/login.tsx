@@ -1,5 +1,5 @@
 import { ContentLayout } from "~/components/layout/ContentLayout";
-import { Form, useActionData, useLoaderData, useTransition } from "@remix-run/react";
+import { useActionData, useLoaderData, useNavigation } from "@remix-run/react";
 import React, { useRef } from "react";
 import { json, type ActionFunction, type LoaderArgs } from "@remix-run/node";
 import { authenticator } from "~/utils/authenticate";
@@ -19,42 +19,39 @@ export const action: ActionFunction = async ({ request, context }) => {
   const resp = await authenticator.authenticate("user", request, {
     successRedirect: "/passwords",
     failureRedirect: "/login",
-    throwOnError: true,
     context
   });
-  return resp;
+  return (resp);
 }
 
 
 export default function Login() {
   const loaderData = useLoaderData();
-  const transition = useTransition();
   const actionData = useActionData();
-  const isBusy = transition.submission;
+  const navigation = useNavigation();
+  const isBusy = navigation.state = "submitting";
 
   const [showMasterPassword, setShowMasterPassword] = React.useState(false);
 
-  const [action, setAction] = React.useState("login");
-
+  const [formAction, setFormAction] = React.useState("login");
 
   const passwordRef = useRef<HTMLInputElement>(null)
-
   return (
     <ContentLayout>
       <div className="h-full w-full m-0 p-0 flex justify-center flex-col items-center">
         <button
-          onClick={() => setAction(action === "login" ? "register" : "login")}
+          onClick={() => setFormAction(formAction === "login" ? "register" : "login")}
           className="absolute top-8 right-8 rounded-xl bg-cobalt-midnight font-semibold text-white px-3 py-2 transition duration-300 ease-in-out hover:bg-yellow-400 hover:-translate-y-1"
         >
-          {action === "login" ? "Sign Up" : "Log In"}
+          {formAction === "login" ? "Sign Up" : "Log In"}
         </button>
         <div>{actionData}</div>
-        <Form method="post" className="rounded-2xl bg-white p-6 w-3/4">
+        <form method="post" className="rounded-2xl bg-white p-6 w-3/4">
 
           <label htmlFor="email" className="text-midnight font-semibold">
             Email
           </label>
-          <input name="_action" value={action} type="hidden" />
+          <input name="_action" value={formAction} type="hidden" />
           <input
             type="text"
             id="email"
@@ -92,9 +89,7 @@ export default function Login() {
             name="password"
             className="w-full p-2 border focus:outline-cobalt-midnight rounded-xl my-2"
           />
-
-
-          {action === "register" && (
+          {formAction === "register" && (
             <>
               <label
                 htmlFor="firstName"
@@ -125,7 +120,7 @@ export default function Login() {
               type="submit"
               className="cursor-pointer rounded-xl mt-2 bg-cobalt-midnight px-3 py-2 text-white font-semibold transition duration-300 ease-in-out hover:bg-yellow-400 hover:-translate-y-1"
               value={
-                action === "login"
+                formAction === "login"
                   ? isBusy
                     ? "Signing In..."
                     : "Sign In"
@@ -136,7 +131,7 @@ export default function Login() {
             />
           </div>
           {loaderData?.error ? <div>{loaderData.error.message}</div> : null}
-        </Form>
+        </form>
       </div>
     </ContentLayout >
   );
