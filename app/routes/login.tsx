@@ -1,5 +1,5 @@
 import { ContentLayout } from "~/components/layout/ContentLayout";
-import { useActionData, useLoaderData, useNavigation } from "@remix-run/react";
+import { Form, useActionData, useLoaderData, useNavigation } from "@remix-run/react";
 import React, { useRef } from "react";
 import { json, type ActionFunction, type LoaderArgs } from "@remix-run/node";
 import { authenticator } from "~/utils/authenticate";
@@ -7,12 +7,20 @@ import { sessionStorage } from "~/utils/auth.server";
 import { EyeIcon, EyeOffIcon } from "@heroicons/react/outline";
 
 export async function loader(args: LoaderArgs) {
-  const session = await sessionStorage.getSession(
-    args.request.headers.get('Cookie')
-  )
-  const error = session.get("sessionErrorKey");
+  await authenticator.isAuthenticated(args.request, {
+    successRedirect: "/passwords",
+  });
+  const session = await sessionStorage.getSession(args.request.headers.get('Cookie'))
+  const error: { message: string } = session.get(authenticator.sessionErrorKey);
 
-  return json<any>({ error });
+  return json(
+    { error },
+    {
+      headers: {
+        "Set-Cookie": await sessionStorage.commitSession(session),
+      },
+    }
+  );
 }
 
 export const action: ActionFunction = async ({ request, context }) => {
@@ -24,18 +32,32 @@ export const action: ActionFunction = async ({ request, context }) => {
   return (resp);
 }
 
+function parseLoaderData(data: { error: { message: string; }; }): string {
+  let splitData = data.error.message.split(":")
+  if (splitData[0] == "Invariant failed") {
+    console.log('in invariant failed');
+    return splitData.slice(1).join("")
+  }
+  return data.error.message;
+}
+
 
 export default function Login() {
-  const loaderData = useLoaderData();
+  const oldLoaderData = useLoaderData<typeof loader>();
+  let errorMessage;
+  errorMessage = oldLoaderData.error != undefined && parseLoaderData(oldLoaderData)
   const actionData = useActionData();
   const navigation = useNavigation();
-  const isBusy = navigation.state = "submitting";
+  const navigationFormAction = navigation.formData?.get("_action");
+  const isBusy = navigation.state == "submitting" && (navigationFormAction == "login" || navigationFormAction == "register")
 
   const [showMasterPassword, setShowMasterPassword] = React.useState(false);
 
   const [formAction, setFormAction] = React.useState("login");
 
   const passwordRef = useRef<HTMLInputElement>(null)
+
+
   return (
     <ContentLayout>
       <div className="h-full w-full m-0 p-0 flex justify-center flex-col items-center">
@@ -46,7 +68,7 @@ export default function Login() {
           {formAction === "login" ? "Sign Up" : "Log In"}
         </button>
         <div>{actionData}</div>
-        <form method="post" className="rounded-2xl bg-white p-6 w-3/4">
+        <Form method="post" className="rounded-2xl bg-white p-6 w-3/4">
 
           <label htmlFor="email" className="text-midnight font-semibold">
             Email
@@ -130,8 +152,10 @@ export default function Login() {
               }
             />
           </div>
-          {loaderData?.error ? <div>{loaderData.error.message}</div> : null}
-        </form>
+          {errorMessage ?
+            <div className="flex justify-center mt-2 text-red-500 bg-stone-light py-2 px-1 rounded-lg bg-opacity-50 text-center items-center font-bold">{errorMessage}</div>
+            : null}
+        </Form>
       </div>
     </ContentLayout >
   );
