@@ -7,3 +7,4 @@ app/styles/app.css
 /public/build
 .env
 app/styles/app.css
+.VSCodeCounter
