@@ -1,4 +1,4 @@
-import type { ActionArgs, MetaFunction , LoaderArgs } from "@remix-run/node";
+import type { ActionArgs, MetaFunction, LoaderArgs } from "@remix-run/node";
 
 import styles from "../styles/app.css";
 import { authenticator } from "~/utils/authenticate";

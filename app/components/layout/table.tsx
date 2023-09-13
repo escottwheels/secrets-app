@@ -4,7 +4,7 @@ import clsx from "clsx";
 import type { Password } from "@prisma/client";
 import { EyeIcon, EyeOffIcon, DotsVerticalIcon } from "@heroicons/react/outline";
 import { Form, useNavigation } from "@remix-run/react";
-import { Checkbox, MenuItem, Popover } from "@mui/material";
+import { Checkbox } from "@mui/material";
 import { Circle, CircleOutlined, DeleteOutline } from "@mui/icons-material";
 import { ClipLoader } from "react-spinners";
 
@@ -37,20 +37,6 @@ export const PasswordText = ({ password, className }: PasswordTextProps) => {
 export const PasswordRow = ({ password, className, IsEditable, setSelectedPasswords }: PasswordRowProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const [canEditPassword, setCanEditPassword] = useState(false)
-
-
-  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
-
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const open = Boolean(anchorEl);
-  const id = open ? 'simple-popover' : undefined;
 
   return (
     <tr
@@ -89,39 +75,24 @@ export const PasswordRow = ({ password, className, IsEditable, setSelectedPasswo
             }} />
         </td>}
       <td
-
-        className="hover:text-cobalt hover:cursor-pointer hover:font-bold px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-        <Popover
-          id={id}
-          open={open}
-          anchorEl={anchorEl}
-          onClose={handleClose}
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'left',
-          }}
-        >
-          <MenuItem className="text-xs">Edit</MenuItem>
-          <MenuItem className="text-xs">Delete</MenuItem>
-        </Popover>
-        <span onClick={handleClick}>{password.website}</span>
+        className="hover:text-cobalt hover:cursor-pointer hover:font-bold px-6 py-4 text-sm font-medium text-gray-900">
+        <span>{password.website}</span>
       </td>
-      <td className="flex align-center px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+      <td className="group inline-flex items-center px-6 py-4 text-sm font-medium text-gray-900">
         {canEditPassword && <input type="hidden" name="_action" value="editPassword" />}
         {canEditPassword && <input type="hidden" name="passwordId" value={password.id} />}
+        {canEditPassword && <input type="submit" style={{ display: "none" }} />}
         <input onDoubleClick={() => {
           setCanEditPassword(!canEditPassword)
+          setShowPassword(false)
         }}
           name="password"
           onBlur={() => setCanEditPassword(false)}
-          className="group px-2 py-1 focus:none focus:outline-none border-b border-stone-light read-only:border-0 read-only:cursor-pointer"
-          readOnly={canEditPassword || showPassword ? false : true} type={canEditPassword || showPassword ? "text" : "password"} defaultValue={password.password} />
+          className="group flex items-center px-2 py-1 focus:none focus:outline-none border-b border-stone-light read-only:border-0 read-only:cursor-pointer"
+          readOnly={canEditPassword ? false : true} type={canEditPassword || showPassword ? "text" : "password"} defaultValue={password.password} />
         {!showPassword ?
           <EyeIcon
-            className="w-4 h-4 ml-1 group-hover:visible invisible cursor-pointer text-gray-500 hover:text-gray-900"
-            onClick={() => {
-              setShowPassword(!showPassword);
-            }}
+            className="w-4 h-4 ml-1 disabled:invisible group-hover:visible invisible cursor-pointer text-gray-500 hover:text-gray-900"
           />
           : <EyeOffIcon
             className="w-4 h-4 ml-1 group-hover:visible invisible cursor-pointer text-gray-500 hover:text-gray-900"
@@ -155,7 +126,7 @@ export const PasswordTable = ({ passwords: items, className, isEditable, InputPa
   }
 
   return (
-    <Form reloadDocument id="edit-password" method="post">
+    <Form id="edit-password" method="post">
       <table
         className={clsx(className, "mb-20 bg-white rounded-lg")}
       >
@@ -167,13 +138,13 @@ export const PasswordTable = ({ passwords: items, className, isEditable, InputPa
               </th>}
             <th
               scope="col"
-              className="text-sm font-medium text-gray-900  px-6 py-4 text-left"
+              className="w-1/2 text-sm font-medium text-gray-900  px-6 py-4 text-left"
             >
               WEBSITE
             </th>
             <th
               scope="col"
-              className="text-sm font-medium text-gray-900 px-6 py-4 text-left"
+              className="w-1/2 text-sm font-medium text-gray-900 px-6 py-4 text-left"
             >
               PASSWORD
             </th>

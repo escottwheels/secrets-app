@@ -38,11 +38,13 @@ export async function action(args: ActionArgs) {
       const password = body.get("password");
       invariant(typeof password === "string", "Invalid password");
       const website = body.get("website");
+      invariant(website != null && website.length > 0, "Must enter a website")
       invariant(typeof website === "string", "Invalid website");
       const userId = body.get("userId");
       invariant(typeof userId === "string", "Invalid userId");
       await addPasswordToUser(userId, password, website);
-      return "success"
+      return "addSuccess"
+
     }
     case "deletePassword": {
       const { user } = await (await loader(args)).json()
@@ -51,7 +53,7 @@ export async function action(args: ActionArgs) {
       invariant(typeof passwordsData === "string", "List must be of password Ids")
       const passwords = passwordsData.split(",")
       await deletePasswordsFromUser(user.id, passwords.map(p => parseInt(p)))
-      return null;
+      return "deleteSuccess";
     }
     case "editPassword": {
       const passwordId = body.get("passwordId")
@@ -68,13 +70,13 @@ export async function action(args: ActionArgs) {
 const AddPasswordInputs = ({ userId }: { userId: string }) => {
   return (
     <tr
-      className="md:max-w-xl max-w-xs table-row even:bg-slate-200"
+      className="max-w-xl table-row even:bg-slate-200"
     >
-      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-        <input form="edit-password" placeholder="technologyunleashed.org" className="px-2 py-1 rounded-lg border border-stone-light focus:outline-cobalt h-8 placeholder:italic" id="webiste" name="website" autoFocus />
+      <td className="px-6 py-4 text-sm font-medium text-gray-900">
+        <input form="edit-password" className="w-full px-2 py-1 text-sm rounded-lg border border-stone-light focus:outline-cobalt h-8 placeholder:italic" id="website" name="website" autoFocus />
       </td>
-      <td className="group flex align-center px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-        <input form="edit-password" placeholder='Str4gP@ssword123' className="px-2 py-1 rounded-lg border border-stone-light focus:outline-cobalt h-8 placeholder:italic" type="sub" name="password" id="password" />
+      <td className="group px-6 py-4 text-sm font-medium text-gray-900">
+        <input form="edit-password" className="w-full px-2 py-1 text-sm rounded-lg border border-stone-light focus:outline-cobalt h-8 placeholder:italic" type="sub" name="password" id="password" />
         <input form="edit-password" type="hidden" name="userId" value={userId} />
         <input form="edit-password" type="hidden" name="_action" value={"addPassword"} />
         <button type="submit"></button>
@@ -87,7 +89,6 @@ export default function PasswordScreen() {
   const [showAddPasswordFields, setShowAddPasswordFields] = useState(false);
   const [isEditable, setIsEditable] = useState(false)
 
-
   const navigate = useNavigate();
   const navigation = useNavigation();
   const actionData = useActionData();
@@ -99,22 +100,28 @@ export default function PasswordScreen() {
   const { user, passwords } = useLoaderData<typeof loader>();
 
   useEffect(() => {
-    if (actionData === "success") {
+    if (actionData === "addSuccess") {
       setShowAddPasswordFields(false);
     }
-  }, [actionData]);
+
+    if (actionData === "deleteSuccess") {
+      console.log('hello');
+    }
+  }, [passwords, actionData]);
+
+
 
   return (
-    <div className="flex justify-center text-white"
+    <div className="flex justify-center text-white w-full"
     >
-      <UserCircleIcon className={clsx(isProfilePageOpen && "border border-white", "z-10 cursor-pointer absolute w-12 h-10 top-8  right-0 mr-6 rounded-xl bg-cobalt-midnight font-semibold text-white px-3 py-2 transition duration-300 ease-in-out hover:bg-yellow-400 hover:-translate-y-1")}
+      <UserCircleIcon className={clsx(isProfilePageOpen && "border border-white", "z-10 cursor-pointer absolute w-10 h-10 top-4 right-0 mr-4 rounded-xl bg-cobalt-midnight font-semibold text-white p-2 transition duration-300 ease-in-out hover:bg-yellow-400 hover:-translate-y-1")}
         onClick={() => {
           navigate(isProfilePageOpen ? ".." : "profile")
         }}
       />
       {isProfilePageOpen && <Outlet />}
-      <div className="grow md:max-w-xl">
-        <div className="flex justify-center justify-end">
+      <div className="grow">
+        <div className="flex justify-center">
           <button
             className="grow mr-2 flex-end rounded-xl w-30 h-15 mt-2 bg-cobalt-midnight px-3 py-2 text-white font-semibold transition duration-300 ease-in-out hover:bg-red-500 hover:-translate-y-1"
             onClick={() => {
@@ -127,12 +134,6 @@ export default function PasswordScreen() {
             disabled={isEditable}
             className="flex-end mr-2 rounded-xl bg-cobalt-midnight disabled:bg-stone-light disabled:transform-none w-30 h-15 mt-2 px-3 py-2 text-white font-semibold transition duration-300 ease-in-out hover:bg-yellow-400 hover:-translate-y-1"
             onClick={() => {
-              if (showAddPasswordFields) {
-                window.history.back()
-              }
-              else {
-                window.history.pushState(null, "", `${location.pathname}/add`)
-              }
               setShowAddPasswordFields(!showAddPasswordFields)
             }}
           >

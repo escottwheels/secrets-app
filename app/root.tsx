@@ -24,19 +24,18 @@ export default function App() {
   return (
     <html lang="en">
       <head>
-        <meta charSet="utf-8" />
-        {/* <meta name="viewport" content="width=device-width,initial-scale=1" /> */}
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
         <Meta />
         <Links />
       </head>
-      <body className="bg-cobalt ">
-        <div className="bg-cobalt flex flex-col items-center">
+      <body className="bg-cobalt h-screen w-screen">
+        <div className="flex flex-col items-center justify-center">
           <ContentLayout className="py-6 mx-96">
             <span className="flex justify-center items-center">
-              <h2 className="text-white items-center font-extrabold text-9xl mt-10 mb-10">
+              <h2 className="text-white text-8xl lg:text-9xl items-center font-extrabold">
                 secrets
               </h2>
-              <LockClosedIcon className="text-white ml-2 w-16 h-12" />
+              <LockClosedIcon className="text-white ml-2 w-16 h-16" />
             </span>
             <Outlet />
           </ContentLayout>

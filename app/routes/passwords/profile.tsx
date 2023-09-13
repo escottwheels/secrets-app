@@ -52,7 +52,7 @@ export default function ProfileScreen() {
                     method: "post",
                     action: "/?index"
                 })}
-                className="z-10 absolute top-8 right-0 transform-gpu transition-all mr-20 rounded-xl bg-cobalt-midnight border border-white font-semibold text-white px-3 py-2 duration-300 ease-out hover:-translate-y-1 hover:bg-yellow-400 hover:border-cobalt-midnight"
+                className="z-10 absolute top-4 right-16 transform-gpu transition-all mr-1 rounded-xl bg-cobalt-midnight border border-white font-semibold text-white px-3 py-2 duration-300 ease-out hover:-translate-y-1 hover:bg-yellow-400 hover:border-cobalt-midnight"
             >
                 {`Log out ${user.firstName ?? ""}`}
             </button >
