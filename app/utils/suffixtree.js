@@ -17,8 +17,6 @@ Node.prototype.isLeaf = function () {
     return Object.keys(this.transition).length === 0;
 }
 
-
-
 export class SuffixTreeOld {
     constructor() {
         this.text = '';
@@ -174,7 +172,7 @@ SuffixTreeOld.prototype.convertToJson = function () {
                 cchild['start'] = "" + (str_list[position].length - suffix.length);
                 cchild['seq'] = position + 1;
             }
-            cchild['seq'] = position
+            // cchild['seq'] = position
             cchild = traverse(s, seps, str_list, cchild);
             ret["children"].push(cchild)
         }
@@ -188,21 +186,32 @@ SuffixTreeOld.prototype.convertToJson = function () {
 
 SuffixTreeOld.prototype.toString = function () {
     var text = this.text;
-
+    console.log(text);
     function traverse(node, offset, ret) {
         offset = typeof offset !== 'undefined' ? offset : '';
         ret = typeof ret !== 'undefined' ? ret : '';
+        var currWord = ""
         for (var t in node.transition) {
+            console.log(t);
             var traNs = node.transition[t];
             var s = traNs[0], a = traNs[1], b = traNs[2];
+            // console.log(s, a, b);
+            if (s.suffixLink != null) {
+                console.log(s);
+                currWord += text.substring(a, b + 1);
+                console.log(currWord);
+            }
             // console.log(s);
-            ret += offset + '["' + text.substring(a, b + 1) + '", ' + a + ', ' + b + ']' + '\r\n';
+            // ret += offset + '["' + text.substring(a, b + 1) + '", ' + a + ', ' + b + ']' + '\r\n';
+            console.log("offset: '" + offset + "'");
+            // console.log(ret);
             ret += traverse(s, offset + '\t');
         }
-        return "";
+        console.log('done with transition');
+        return ret;
     }
     var res = traverse(this.root)
-    return "";
+    return res;
 }
 
 SuffixTreeOld.prototype.print = function () {
