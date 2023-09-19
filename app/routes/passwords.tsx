@@ -11,6 +11,7 @@ import {
   useLocation,
   useNavigate,
   useNavigation,
+  useRouteError,
 } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import { addPasswordToUser, deletePasswordsFromUser, editPassword } from "~/business/passwords";
@@ -18,7 +19,22 @@ import { addPasswordToUser, deletePasswordsFromUser, editPassword } from "~/busi
 import invariant from "tiny-invariant";
 import { authenticator } from "~/utils/authenticate";
 import clsx from 'clsx';
-import { UndoOutlined } from '@mui/icons-material';
+import { ArrowBack, UndoOutlined } from '@mui/icons-material';
+
+
+export function ErrorBoundary() {
+  const error = useRouteError() as { message: string };
+  const navigater = useNavigate();
+  return (
+    <div className="rounded-lg font-bold h-full flex-col justify-center p-10 text-cobalt bg-white w-full">
+      <span><ArrowBack className='cursor-pointer transition duration-300 hover:-translate-y-1 ease-in-out text-cobalt w-16 h-16' onClick={() => navigater("..")} /></span>
+      <span className='flex items-center justify-center flex-col'>
+        <h2 className='text-2xl'>Oops! an error occured!</h2>
+        <h1 className='text-base'>{error?.message}</h1>
+      </span>
+    </div>
+  );
+}
 
 export async function loader(args: LoaderArgs) {
   const user = await authenticator.isAuthenticated(args.request, {
@@ -44,7 +60,6 @@ export async function action(args: ActionArgs) {
       invariant(typeof userId === "string", "Invalid userId");
       await addPasswordToUser(userId, password, website);
       return "addSuccess"
-
     }
     case "deletePassword": {
       const { user } = await (await loader(args)).json()
@@ -58,12 +73,9 @@ export async function action(args: ActionArgs) {
     case "editPassword": {
       const passwordId = body.get("passwordId")
       invariant(typeof passwordId === "string", "Invalid updated password id")
-      console.log(passwordId);
       const newPassword = body.get("password")
       invariant(typeof newPassword === "string", "Invalid updated password")
-      console.log(newPassword);
-      const updatedPassword = await editPassword(parseInt(passwordId), newPassword);
-      console.log(updatedPassword);
+      await editPassword(parseInt(passwordId), newPassword);
       return "editSuccess"
     }
   }
@@ -115,8 +127,7 @@ export default function PasswordScreen() {
 
 
   return (
-    <div className="flex justify-center text-white w-full"
-    >
+    <div className="flex justify-center text-white w-full">
       <UserCircleIcon className={clsx(isProfilePageOpen && "border border-white", "z-10 cursor-pointer absolute w-10 h-10 top-4 right-0 mr-4 rounded-xl bg-cobalt-midnight font-semibold text-white p-2 transition duration-300 ease-in-out hover:bg-yellow-400 hover:-translate-y-1")}
         onClick={() => {
           navigate(isProfilePageOpen ? ".." : "profile")

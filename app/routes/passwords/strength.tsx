@@ -4,7 +4,7 @@ import { ContentLayout } from "~/components/layout/ContentLayout";
 import { loader as parentLoader } from "../passwords"
 import { useLoaderData } from "@remix-run/react";
 import type { Password } from "@prisma/client";
-import type { PasswordSimilarityScore} from "../../business/calculatePasswordStrengths";
+import type { PasswordSimilarityScore } from "../../business/calculatePasswordStrengths";
 import { findPasswordSimilarityScore } from "../../business/calculatePasswordStrengths"
 
 export async function loader(args: LoaderArgs) {
@@ -14,7 +14,6 @@ export async function loader(args: LoaderArgs) {
     const passwordsMatched: string[] = [];
     for (let i = 0; i < levenshteinDistances.length; i++) {
         if (!passwordsMatched.includes(levenshteinDistances[i][0]?.website ?? "")) {
-            console.log('adding');
             passwordsMatched.push(levenshteinDistances[i][0]?.website ?? "")
             newLevenshteinDistances.push(levenshteinDistances[i])
         }
@@ -24,7 +23,6 @@ export async function loader(args: LoaderArgs) {
 
 export default function PasswordsSimilarityStrength() {
     const { newLevenshteinDistances } = useLoaderData() as { newLevenshteinDistances: PasswordSimilarityScore[], passwords: Password[] };
-    console.log(newLevenshteinDistances);
     return (
         <ContentLayout>
             <div className="bg-white p-8 rounded-lg flex flex-col items-center justify-center rounded-xl mt-1 ">

@@ -43,10 +43,8 @@ function findRepeatingSubstrings(passwordList: Password[], threshold: number) {
     const n = passwordList.length;
     for (let i = 0; i < n; i++) {
         for (let j = i + 1; j < n; j++) {
-            console.log(i, j);
             let dist = levenshtein(passwordList[i].password, passwordList[j].password)
             let score = 1 - (dist / Math.max(passwordList[i].password.length, passwordList[j].password.length))
-            console.log('score: ' + score);
             if (score >= threshold) {
                 repeatingStrings.push([{ website: passwordList[i].website, password: passwordList[i].password }, { website: passwordList[j].website, password: passwordList[j].password }, score * 100])
                 // passwordsMatched.push(passwordList[i].id)
