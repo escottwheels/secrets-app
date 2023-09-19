@@ -25,6 +25,7 @@
     "check-if-word": "^1.2.1",
     "clsx": "^1.2.1",
     "evergreen-ui": "^6.10.3",
+    "js-levenshtein": "^1.1.6",
     "lint-staged": "^13.0.3",
     "prisma": "^4.3.1",
     "react": "^18.2.0",

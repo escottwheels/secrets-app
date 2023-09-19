@@ -17,7 +17,7 @@ Node.prototype.isLeaf = function () {
     return Object.keys(this.transition).length === 0;
 }
 
-export class SuffixTreeOld {
+export class SuffixTree {
     constructor() {
         this.text = '';
         this.str_list = [];
@@ -33,7 +33,7 @@ export class SuffixTreeOld {
 
 
 
-SuffixTreeOld.prototype.addString = function (str) {
+SuffixTree.prototype.addString = function (str) {
     var temp = this.text.length;
     this.text += str;
     this.seps.push(str[str.length - 1])
@@ -62,7 +62,7 @@ SuffixTreeOld.prototype.addString = function (str) {
 }
 
 
-SuffixTreeOld.prototype.update = function (start, k, i) {
+SuffixTree.prototype.update = function (start, k, i) {
 
     var oldRoot = this.root;
     var endAndr = this.testAndSplit(start, k, i - 1, this.text[i]);
@@ -92,7 +92,7 @@ SuffixTreeOld.prototype.update = function (start, k, i) {
 }
 
 
-SuffixTreeOld.prototype.testAndSplit = function (s, k, p, t) {
+SuffixTree.prototype.testAndSplit = function (s, k, p, t) {
     if (k <= p) {
         var traNs = s.transition[this.text[k]];
         var s2 = traNs[0], k2 = traNs[1], p2 = traNs[2];
@@ -113,7 +113,7 @@ SuffixTreeOld.prototype.testAndSplit = function (s, k, p, t) {
 }
 
 
-SuffixTreeOld.prototype.canonize = function (s, k, p) {
+SuffixTree.prototype.canonize = function (s, k, p) {
     if (p < k)
         return [s, k];
     else {
@@ -135,7 +135,7 @@ SuffixTreeOld.prototype.canonize = function (s, k, p) {
 }
 
 
-SuffixTreeOld.prototype.convertToJson = function () {
+SuffixTree.prototype.convertToJson = function () {
     // convert tree to json to use with d3js
 
     var text = this.text;
@@ -184,36 +184,24 @@ SuffixTreeOld.prototype.convertToJson = function () {
 
 }
 
-SuffixTreeOld.prototype.toString = function () {
+SuffixTree.prototype.toString = function () {
     var text = this.text;
-    console.log(text);
+
     function traverse(node, offset, ret) {
         offset = typeof offset !== 'undefined' ? offset : '';
         ret = typeof ret !== 'undefined' ? ret : '';
-        var currWord = ""
         for (var t in node.transition) {
-            console.log(t);
             var traNs = node.transition[t];
             var s = traNs[0], a = traNs[1], b = traNs[2];
-            // console.log(s, a, b);
-            if (s.suffixLink != null) {
-                console.log(s);
-                currWord += text.substring(a, b + 1);
-                console.log(currWord);
-            }
-            // console.log(s);
-            // ret += offset + '["' + text.substring(a, b + 1) + '", ' + a + ', ' + b + ']' + '\r\n';
-            console.log("offset: '" + offset + "'");
-            // console.log(ret);
+            ret += offset + '["' + text.substring(a, b + 1) + '", ' + a + ', ' + b + ']' + '\r\n';
             ret += traverse(s, offset + '\t');
         }
-        console.log('done with transition');
         return ret;
     }
     var res = traverse(this.root)
     return res;
 }
 
-SuffixTreeOld.prototype.print = function () {
+SuffixTree.prototype.print = function () {
     console.log(this.toString());
 }

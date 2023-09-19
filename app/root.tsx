@@ -28,7 +28,7 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body className="bg-cobalt overflow-y-hidden">
+      <body className="bg-cobalt">
         <div className="w-full flex flex-col items-center justify-start mt-10">
           <ContentLayout className="py-6 mx-96">
             <span className="flex justify-center items-center mb-5">

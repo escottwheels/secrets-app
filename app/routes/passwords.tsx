@@ -58,10 +58,13 @@ export async function action(args: ActionArgs) {
     case "editPassword": {
       const passwordId = body.get("passwordId")
       invariant(typeof passwordId === "string", "Invalid updated password id")
+      console.log(passwordId);
       const newPassword = body.get("password")
       invariant(typeof newPassword === "string", "Invalid updated password")
-      await editPassword(parseInt(passwordId), newPassword);
-      return null
+      console.log(newPassword);
+      const updatedPassword = await editPassword(parseInt(passwordId), newPassword);
+      console.log(updatedPassword);
+      return "editSuccess"
     }
   }
   return null
@@ -105,7 +108,7 @@ export default function PasswordScreen() {
     }
 
     if (actionData === "deleteSuccess") {
-      console.log('hello');
+      window.location.reload()
     }
   }, [passwords, actionData]);
 

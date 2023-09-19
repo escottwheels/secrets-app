@@ -93,7 +93,7 @@ export const PasswordRow = ({ password, className, IsEditable, setSelectedPasswo
           setCanEditPassword(!canEditPassword)
           setShowPassword(false)
         }}
-          name="password"
+          name={canEditPassword ? "password" : "blank"}
           onBlur={() => setCanEditPassword(false)}
           className="group flex items-center px-2 py-1 focus:none focus:outline-none border-b border-stone-light read-only:border-0 read-only:cursor-pointer"
           readOnly={canEditPassword ? false : true} type={canEditPassword || showPassword ? "text" : "password"} defaultValue={password.password} />
@@ -150,7 +150,7 @@ export const PasswordTable = ({ passwords: items, className, isEditable, InputPa
               scope="col"
               className="w-1/2 text-sm font-medium text-gray-900  px-6 py-4 text-left"
             >
-              WEBSITE
+              NAME
             </th>
             <th
               scope="col"
