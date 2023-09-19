@@ -28,10 +28,10 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body className="bg-cobalt h-screen w-screen">
-        <div className="flex flex-col items-center justify-center">
+      <body className="bg-cobalt overflow-y-hidden">
+        <div className="w-full flex flex-col items-center justify-start mt-10">
           <ContentLayout className="py-6 mx-96">
-            <span className="flex justify-center items-center">
+            <span className="flex justify-center items-center mb-5">
               <h2 className="text-white text-8xl lg:text-9xl items-center font-extrabold">
                 secrets
               </h2>

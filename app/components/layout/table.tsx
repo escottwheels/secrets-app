@@ -1,9 +1,9 @@
 import type { Dispatch, SetStateAction } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import clsx from "clsx";
 import type { Password } from "@prisma/client";
 import { EyeIcon, EyeOffIcon, DotsVerticalIcon } from "@heroicons/react/outline";
-import { Form, useNavigation } from "@remix-run/react";
+import { Form, useActionData, useNavigation } from "@remix-run/react";
 import { Checkbox } from "@mui/material";
 import { Circle, CircleOutlined, DeleteOutline } from "@mui/icons-material";
 import { ClipLoader } from "react-spinners";
@@ -35,8 +35,15 @@ export const PasswordText = ({ password, className }: PasswordTextProps) => {
 };
 
 export const PasswordRow = ({ password, className, IsEditable, setSelectedPasswords }: PasswordRowProps) => {
+  const editPasswordResponse = useActionData()
   const [showPassword, setShowPassword] = useState(false);
   const [canEditPassword, setCanEditPassword] = useState(false)
+
+  useEffect(() => {
+    if (editPasswordResponse == "editSuccess") {
+      setCanEditPassword(false)
+    }
+  }, [editPasswordResponse, password])
 
   return (
     <tr
@@ -92,10 +99,13 @@ export const PasswordRow = ({ password, className, IsEditable, setSelectedPasswo
           readOnly={canEditPassword ? false : true} type={canEditPassword || showPassword ? "text" : "password"} defaultValue={password.password} />
         {!showPassword ?
           <EyeIcon
-            className="w-4 h-4 ml-1 disabled:invisible group-hover:visible invisible cursor-pointer text-gray-500 hover:text-gray-900"
+            onClick={() => {
+              setShowPassword(!showPassword);
+            }}
+            className={clsx(!canEditPassword && "group-hover:visible", "w-4 h-4 ml-1 disabled:invisible invisible cursor-pointer text-gray-500 hover:text-gray-900")}
           />
           : <EyeOffIcon
-            className="w-4 h-4 ml-1 group-hover:visible invisible cursor-pointer text-gray-500 hover:text-gray-900"
+            className={clsx(!canEditPassword && "group-hover:visible", "w-4 h-4 ml-1 invisible cursor-pointer text-gray-500 hover:text-gray-900")}
             onClick={() => {
               setShowPassword(!showPassword);
             }}

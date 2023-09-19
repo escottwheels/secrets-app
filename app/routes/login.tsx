@@ -153,7 +153,7 @@ export default function Login() {
             />
           </div>
           {errorMessage ?
-            <div className="flex justify-center mt-2 text-red-500 bg-stone-light py-2 px-1 rounded-lg bg-opacity-50 text-center items-center font-bold">{errorMessage}</div>
+            <div className="flex justify-center mt-2 text-red-500 border-2 rounded-lg border-stone-light py-2 px-1 text-center items-center font-bold">{errorMessage}</div>
             : null}
         </Form>
       </div>

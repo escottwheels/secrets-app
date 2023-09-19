@@ -30,6 +30,5 @@ export function findPasswordSimilarity(passwords: Password[]) {
             passwordRatingDict.push({ sub: node.name, occurences: node.children.map((c: { seq: any; }) => c.seq), startIndices: node.children.map((c: { start: any; }) => parseInt(c.start)), numOccurences: node.children.length, isWord: wordsDict.check(node.name) })
         }
     }
-
     return passwordRatingDict;
 }

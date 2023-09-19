@@ -13,7 +13,6 @@ export const createOrFindUser = async ({
   firstName,
   lastName
 }: createUserProps) => {
-  console.log("in createOrFindUser");
   const passwordHash = await bcrypt.hash(password, 10);
   let user = await prisma.user.findUnique({
     where: {

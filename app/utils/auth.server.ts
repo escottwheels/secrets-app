@@ -17,7 +17,7 @@ export const sessionStorage = createCookieSessionStorage({
     secrets: [sessionSecret],
     sameSite: "lax",
     path: "/",
-    maxAge: 1 * 60 * 30,
+    maxAge: 1 * 60 * 60 * 2, // 1 min * 60 * 2 = 2 hours
     httpOnly: true,
   },
 });

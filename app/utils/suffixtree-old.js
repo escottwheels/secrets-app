@@ -168,12 +168,13 @@ SuffixTreeOld.prototype.convertToJson = function () {
                 "name": name,
                 "parent": ret['name'],
                 "suffix": suffix,
-                "children": []
+                "children": [],
             };
             if (s.isLeaf()) {
-                cchild['seq'] = position + 1;
                 cchild['start'] = "" + (str_list[position].length - suffix.length);
+                cchild['seq'] = position + 1;
             }
+            cchild['seq'] = position
             cchild = traverse(s, seps, str_list, cchild);
             ret["children"].push(cchild)
         }
@@ -194,7 +195,7 @@ SuffixTreeOld.prototype.toString = function () {
         for (var t in node.transition) {
             var traNs = node.transition[t];
             var s = traNs[0], a = traNs[1], b = traNs[2];
-            console.log(s);
+            // console.log(s);
             ret += offset + '["' + text.substring(a, b + 1) + '", ' + a + ', ' + b + ']' + '\r\n';
             ret += traverse(s, offset + '\t');
         }
