@@ -24,7 +24,7 @@ export default function App() {
   return (
     <html lang="en">
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <meta name="viewport" content="width=device-width, initial-scale=0.750, maximum-scale=2.0, user-scalable=no" />
         <Meta />
         <Links />
       </head>

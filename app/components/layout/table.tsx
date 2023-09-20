@@ -47,7 +47,7 @@ export const PasswordRow = ({ password, className, IsEditable, setSelectedPasswo
 
   return (
     <tr
-      className={clsx(className, "transition duration-300 ease-in-out")}
+      className={clsx(className, "pytransition duration-300 ease-in-out")}
       key={password.id}
     >
       {IsEditable &&
@@ -82,10 +82,10 @@ export const PasswordRow = ({ password, className, IsEditable, setSelectedPasswo
             }} />
         </td>}
       <td
-        className="hover:text-cobalt hover:cursor-pointer hover:font-bold px-6 py-4 text-sm font-medium text-gray-900">
+        className="hover:text-cobalt hover:cursor-pointer hover:font-bold pl-6 pr-3 py-2 text-sm font-medium text-gray-900">
         <span>{password.website}</span>
       </td>
-      <td className="group inline-flex items-center px-6 py-4 text-sm font-medium text-gray-900">
+      <td className="group inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900">
         {canEditPassword && <input type="hidden" name="_action" value="editPassword" />}
         {canEditPassword && <input type="hidden" name="passwordId" value={password.id} />}
         {canEditPassword && <input type="submit" style={{ display: "none" }} />}
@@ -141,7 +141,7 @@ export const PasswordTable = ({ passwords: items, className, isEditable, InputPa
         className={clsx(className, "mb-20 bg-white rounded-lg")}
       >
         <thead>
-          <tr className="border-b-2 mx-2">
+          <tr className="border-b-2 mx-1">
             {isEditable &&
               <th scope="col"
                 className="text-sm font-medium text-gray-900">
@@ -184,7 +184,6 @@ export const PasswordTable = ({ passwords: items, className, isEditable, InputPa
         <tbody className="rounded-xl">
           {items.length == 0 && InputPasswordRow == null
             &&
-            // <span className="font-bold bg-white w-full flex text-center justify-center items-center text-cobalt">No password. Click the plus sign to add some secrets!</span>
             <tr>
               <td colSpan={4} className=" py-8 px-2 w-full font-bold grow text-center">
                 <div className="font-extrabold text-xl text-cobalt">No passwords currently entered </div>
