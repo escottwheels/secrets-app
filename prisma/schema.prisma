@@ -13,18 +13,18 @@ datasource db {
 model Password {
   id       Int    @id @default(autoincrement())
   author   User   @relation(fields: [authorId], references: [id])
-  authorId Int
+  authorId String
   password String
   website  String
 }
 
 model User {
-  id        Int        @id @default(autoincrement())
+  id        String     @id @default(uuid())
   email     String     @unique
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   password  String
-  firstName String
-  lastName  String
+  firstName String?
+  lastName  String?
   passwords Password[]
 }

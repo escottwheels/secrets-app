@@ -1,6 +1,4 @@
-import { LockClosedIcon } from "@heroicons/react/outline";
-import type { LoaderArgs, MetaFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
+
 import {
   Links,
   LiveReload,
@@ -8,68 +6,45 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-  useLoaderData,
-} from "@remix-run/react";
-import { ContentLayout } from "./components/layout/ContentLayout";
-import type { NavBarItem } from "./components/layout/NavBar";
-import { NavBar } from "./components/layout/NavBar";
+} from '@remix-run/react';
+import type { MetaFunction } from '@remix-run/node'
+import styles from "./styles/app.css"
+import { ContentLayout } from './components/layout/ContentLayout';
+import { LockClosedIcon } from '@heroicons/react/outline';
 
-import styles from "./styles/app.css";
-import { getUser } from "./utils/auth.server";
+export const meta: MetaFunction = () => {
+  return { title: 'Secrets' };
+};
 
 export function links() {
   return [{ rel: "stylesheet", href: styles }];
 }
 
-export const meta: MetaFunction = () => ({
-  charset: "utf-8",
-  title: "New Remix App",
-  viewport: "width=device-width,initial-scale=1",
-});
-
-export async function loader(args: LoaderArgs) {
-  const user = await getUser(args.request);
-  if (!user) {
-    throw json("NO user");
-  }
-
-  return json({ user });
-}
-
 export default function App() {
-  const { user } = useLoaderData<typeof loader>();
-
-  const navBaritems: NavBarItem[] = [
-    { name: "Passwords", to: "./passwords", prefetch: "intent" },
-  ];
-
   return (
     <html lang="en">
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=0.750, maximum-scale=2.0, user-scalable=no" />
         <Meta />
         <Links />
       </head>
-      <body>
-        <div className="bg-cobalt h-screen flex items-center flex-col">
-          <ContentLayout>
-            <div className="overflow-x-hidden m-0 p-0 bg-cobalt w-screen h-screen flex justify-center flex-col items-center">
-              <span className="text-white">{`${user.firstName} ${user.lastName}`}</span>
-
-              <span className="flex items-center">
-                <h2 className="text-white font-extrabold text-9xl mb-10">
-                  secrets
-                </h2>
-                <LockClosedIcon className="text-white ml-2 w-16 h-16 " />
-              </span>
-              {/* <NavBar direction={"row"} items={navBaritems} /> */}
-              <Outlet />
-            </div>
+      <body className="bg-cobalt">
+        <div className="w-full flex flex-col items-center justify-start mt-10">
+          <ContentLayout className="py-6 mx-96">
+            <span className="flex justify-center items-center mb-5">
+              <h2 className="text-white text-8xl lg:text-9xl items-center font-extrabold">
+                secrets
+              </h2>
+              <LockClosedIcon className="text-white ml-2 w-16 h-16" />
+            </span>
+            <Outlet />
           </ContentLayout>
         </div>
         <ScrollRestoration />
         <Scripts />
-        <LiveReload />
+        {process.env.NODE_ENV === 'development' && <LiveReload />}
       </body>
-    </html>
+    </html >
   );
 }
+

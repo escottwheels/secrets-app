@@ -13,10 +13,10 @@ export const ContentLayout = ({
 }: ContentLayoutProps) => {
   return (
     <div
-      className={clsx(className, "overflow-hidden flex flex-col items-center")}
+      className={clsx(className, "flex flex-col items-center")}
     >
       {title && <span className="text-7xl">{title}</span>}
-      <div className="px-6 mt-1">{children}</div>
+      <div className="w-full h-full mt-1">{children}</div>
     </div>
   );
 };

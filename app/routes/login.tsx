@@ -1,111 +1,117 @@
 import { ContentLayout } from "~/components/layout/ContentLayout";
-import invariant from "tiny-invariant";
-import { Form, useActionData, useTransition } from "@remix-run/react";
-import { LockClosedIcon, LockOpenIcon } from "@heroicons/react/outline";
-import React from "react";
-import type { ActionFunction} from "@remix-run/node";
-import { json } from "@remix-run/node";
-import {
-  validateEmail,
-  validateName,
-  validatePassword,
-} from "~/utils/validators.server";
-import { login, register } from "~/utils/auth.server";
+import { Form, useActionData, useLoaderData, useNavigation } from "@remix-run/react";
+import React, { useRef } from "react";
+import { json, type ActionFunction, type LoaderArgs } from "@remix-run/node";
+import { authenticator } from "~/utils/authenticate";
+import { sessionStorage } from "~/utils/auth.server";
+import { EyeIcon, EyeOffIcon } from "@heroicons/react/outline";
 
-export const action: ActionFunction = async ({ request }) => {
-  const body = await request.formData();
-  const actionType = body.get("_action");
-  const email = body.get("email");
-  invariant(typeof email === "string", "Invalid Email");
-  const password = body.get("password");
-  invariant(typeof password === "string", "Invalid password");
-  var firstName = body.get("firstName");
-  var lastName = body.get("lastName");
-  if (actionType === "register") {
-    invariant(typeof firstName === "string", "Invalid first name");
-    invariant(typeof lastName === "string", "Invalid last name");
-  }
+export async function loader(args: LoaderArgs) {
+  await authenticator.isAuthenticated(args.request, {
+    successRedirect: "/passwords",
+  });
+  const session = await sessionStorage.getSession(args.request.headers.get('Cookie'))
+  const error: { message: string } = session.get(authenticator.sessionErrorKey);
 
-  const errors = {
-    email: validateEmail(email),
-    password: validatePassword(password),
-    ...(actionType === "register"
-      ? {
-          firstName: validateName((firstName as string) || ""),
-          lastName: validateName((lastName as string) || ""),
-        }
-      : {}),
-  };
-
-  if (Object.values(errors).some(Boolean)) {
-    return json(
-      {
-        errors,
-        fields: { email, password, firstName, lastName },
-        form: actionType,
+  return json(
+    { error },
+    {
+      headers: {
+        "Set-Cookie": await sessionStorage.commitSession(session),
       },
-      { status: 400 }
-    );
+    }
+  );
+}
+
+export const action: ActionFunction = async ({ request, context }) => {
+  const resp = await authenticator.authenticate("user", request, {
+    successRedirect: "/passwords",
+    failureRedirect: "/login",
+    context
+  });
+  return (resp);
+}
+
+function parseLoaderData(data: { error: { message: string; }; }): string {
+  let splitData = data.error.message.split(":")
+  if (splitData[0] == "Invariant failed") {
+    console.log('in invariant failed');
+    return splitData.slice(1).join("")
   }
+  return data.error.message;
+}
 
-  switch (actionType) {
-    case "login":
-      return await login({ email, password });
-
-    case "register":
-      firstName = firstName as string;
-      lastName = lastName as string;
-
-      return await register({ email, password, firstName, lastName });
-  }
-};
 
 export default function Login() {
-  const transition = useTransition();
+  const oldLoaderData = useLoaderData<typeof loader>();
+  let errorMessage;
+  errorMessage = oldLoaderData.error != undefined && parseLoaderData(oldLoaderData)
   const actionData = useActionData();
-  const isBusy = transition.submission;
-  const [formData, setFormData] = React.useState({
-    email: "",
-    password: "",
-    // 👇 New fields
-    firstName: "",
-    lastName: "",
-  });
-  const [action, setAction] = React.useState("login");
+  const navigation = useNavigation();
+  const navigationFormAction = navigation.formData?.get("_action");
+  const isBusy = navigation.state == "submitting" && (navigationFormAction == "login" || navigationFormAction == "register")
+
+  const [showMasterPassword, setShowMasterPassword] = React.useState(false);
+
+  const [formAction, setFormAction] = React.useState("login");
+
+  const passwordRef = useRef<HTMLInputElement>(null)
+
 
   return (
     <ContentLayout>
-      <div className="overflow-x-hidden m-0 p-0 bg-cobalt w-screen h-screen flex justify-center flex-col items-center">
+      <div className="h-full w-full m-0 p-0 flex justify-center flex-col items-center">
         <button
-          onClick={() => setAction(action === "login" ? "register" : "login")}
+          onClick={() => setFormAction(formAction === "login" ? "register" : "login")}
           className="absolute top-8 right-8 rounded-xl bg-cobalt-midnight font-semibold text-white px-3 py-2 transition duration-300 ease-in-out hover:bg-yellow-400 hover:-translate-y-1"
         >
-          {action === "login" ? "Sign Up" : "Log In"}
+          {formAction === "login" ? "Sign Up" : "Log In"}
         </button>
         <div>{actionData}</div>
-        <Form method="post" className="rounded-2xl bg-white p-6 w-96">
+        <Form method="post" className="rounded-2xl bg-white p-6 w-3/4">
+
           <label htmlFor="email" className="text-midnight font-semibold">
             Email
           </label>
-          <input name="_action" value={action} type="hidden" />
+          <input name="_action" value={formAction} type="hidden" />
           <input
             type="text"
             id="email"
             name="email"
-            className="w-full p-2 border border-midnight rounded-xl my-2"
+            className="w-full p-2 border focus:outline-cobalt-midnight rounded-xl my-2"
           />
-
-          <label htmlFor="password" className="text-midnight font-semibold">
-            Password
-          </label>
+          <span className="flex items-center">
+            <label htmlFor="password" className="text-midnight font-semibold">
+              Master Password
+            </label>
+            {!showMasterPassword ? <EyeIcon
+              className="h-4 w-4 ml-1 cursor-pointer text-gray-500 hover:text-gray-900"
+              onClick={() => {
+                setShowMasterPassword(!showMasterPassword);
+                passwordRef.current?.focus()
+                if (passwordRef.current) {
+                  setTimeout(() => {
+                    if (passwordRef.current) {
+                      passwordRef.current.selectionStart = passwordRef.current.selectionEnd = 10000;
+                    }
+                  }, 0);
+                }
+              }}
+            /> : <EyeOffIcon
+              onClick={() => {
+                setShowMasterPassword(!showMasterPassword);
+              }}
+              className="h-4 ml-1 w-4 cursor-pointer text-gray-500 hover:text-gray-900"
+            />}
+          </span>
           <input
-            type="password"
+            ref={passwordRef}
+            type={showMasterPassword ? "text" : "password"}
             id="password"
             name="password"
-            className="w-full p-2  border border-colbaltmidnight rounded-xl my-2"
+            className="w-full p-2 border focus:outline-cobalt-midnight rounded-xl my-2"
           />
-
-          {action === "register" && (
+          {formAction === "register" && (
             <>
               <label
                 htmlFor="firstName"
@@ -117,7 +123,7 @@ export default function Login() {
                 type="text"
                 id="firstName"
                 name="firstName"
-                className="w-full p-2 border border-midnight rounded-xl my-2"
+                className="w-full p-2 border focus:outline-cobalt-midnight rounded-xl my-2"
               />
               <label htmlFor="lastName" className="text-midnight font-semibold">
                 Last Name
@@ -126,7 +132,7 @@ export default function Login() {
                 type="text"
                 id="lastName"
                 name="lastName"
-                className="w-full p-2 border border-midnight rounded-xl my-2"
+                className="w-full p-2 border focus:outline-cobalt-midnight rounded-xl my-2"
               />
             </>
           )}
@@ -134,20 +140,23 @@ export default function Login() {
           <div className="w-full text-center">
             <input
               type="submit"
-              className="rounded-xl mt-2 bg-cobalt-midnight px-3 py-2 text-white font-semibold transition duration-300 ease-in-out hover:bg-yellow-400 hover:-translate-y-1"
+              className="cursor-pointer rounded-xl mt-2 bg-cobalt-midnight px-3 py-2 text-white font-semibold transition duration-300 ease-in-out hover:bg-yellow-400 hover:-translate-y-1"
               value={
-                action === "login"
+                formAction === "login"
                   ? isBusy
                     ? "Signing In..."
                     : "Sign In"
                   : isBusy
-                  ? "Signing Up..."
-                  : "Sign Up"
+                    ? "Signing Up..."
+                    : "Sign Up"
               }
             />
           </div>
+          {errorMessage ?
+            <div className="flex justify-center mt-2 text-red-500 border-2 rounded-lg border-stone-light py-2 px-1 text-center items-center font-bold">{errorMessage}</div>
+            : null}
         </Form>
       </div>
-    </ContentLayout>
+    </ContentLayout >
   );
 }

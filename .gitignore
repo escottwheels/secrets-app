@@ -1,7 +1,10 @@
 node_modules
 app/styles/app.css
+.yarnrc.yml
 
 /.cache
 /build
 /public/build
 .env
+app/styles/app.css
+.VSCodeCounter

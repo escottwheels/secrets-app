@@ -1,5 +1,4 @@
-import { LoaderArgs } from "@remix-run/node";
-import { Dialog } from "evergreen-ui";
+import type { LoaderArgs } from "@remix-run/node";
 import invariant from "tiny-invariant";
 
 export async function loader(args: LoaderArgs) {
@@ -8,4 +7,4 @@ export async function loader(args: LoaderArgs) {
   return null;
 }
 
-export default function Password() {}
+export default function Password() { }
